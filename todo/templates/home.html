@@ -1,0 +1,218 @@
+{% extends "base.html" %}
+
+{% block title %} Home - To-Do List {% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="text-center mb-4 text-primary">To-Do List</h2>
+    
+    <div class="d-flex justify-content-between mb-4">
+        <h4>Current Time: <span class="badge badge-info py-2 px-3" style="font-size: 1.5em;">{{ current_time }}</span></h4>
+        <a href="{{ url_for('add_task') }}" class="btn btn-gradient">Add New Task</a>
+    </div>
+
+    {% if tasks %}
+    <div class="card shadow-lg mb-4 border-light">
+        <div class="card-header bg-soft-purple text-dark">
+            <h5 class="mb-0">Your Tasks</h5>
+        </div>
+        <div class="card-body">
+            <table class="table table-hover table-striped table-bg">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Task Name</th>
+                        <th>Description</th>
+                        <th>Deadline</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for task in tasks %}
+                    <tr>
+                        <td>{{ task.task_name }}</td>
+                        <td>{{ task.task_desc }}</td>
+                        <td>{{ task.deadline.strftime('%H:%M') }}</td>
+                        <td>
+                            <a href="{{ url_for('add_task', task_id=task.task_id) }}" class="btn btn-warning btn-sm">Update</a>
+                            <form method="POST" action="{{ url_for('delete', task_id=task.task_id) }}" style="display:inline;">
+                                <button type="submit" class="btn btn-danger btn-sm">Done</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% else %}
+        <div class="alert alert-info">
+            <p>No tasks available yet! <a href="{{ url_for('add_task') }}" class="btn btn-primary btn-sm">Add Task</a></p>
+        </div>
+    {% endif %}
+
+    {% if missed_tasks %}
+    <div class="card shadow-lg mb-4 border-light">
+        <div class="card-header bg-danger text-white">
+            <h5 class="mb-0">Missed Tasks</h5>
+        </div>
+        <div class="card-body">
+            <table class="table table-hover table-striped">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Task Name</th>
+                        <th>Description</th>
+                        <th>Deadline</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for task in missed_tasks %}
+                    <tr>
+                        <td>{{ task.task_name }}</td>
+                        <td>{{ task.task_desc }}</td>
+                        <td>{{ task.deadline.strftime('%H:%M') }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% else %}
+        <div class="alert alert-warning">
+            <p>No missed tasks!</p>
+        </div>
+    {% endif %}
+</div>
+
+<!-- CSS for Moving Gradient Background -->
+<style>
+   @import url('https://fonts.googleapis.com/css2?family=Anton&family=Russo+One&display=swap');
+
+    body {
+        background: radial-gradient(circle at center, #0b0b0f, #030305);
+        font-family: 'Russo One', sans-serif;
+        color: #dcd8d3; /* Softer off-white for better readability */
+        text-shadow: none;
+        letter-spacing: 0.5px;
+    }
+
+    body::after {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: url('https://www.transparenttextures.com/patterns/asfalt-dark.png'); 
+        opacity: 0.08;
+        pointer-events: none;
+    }
+
+    /* Glassmorphism Panel with Depth */
+    .container {
+        background: rgba(20, 20, 25, 0.85);
+        backdrop-filter: blur(8px);
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0px 8px 30px rgba(130, 60, 10, 0.2);
+        border: 1px solid rgba(130, 60, 10, 0.3);
+        color: #dcd8d3; /* More readable inside containers */
+    }
+
+    /* Dark Gold & Deep Purple Glow */
+    h2, h5 {
+        font-weight: bold;
+        text-transform: uppercase;
+        text-align: center;
+        color: #e0c5a7; /* Warmer gold for contrast */
+        background: linear-gradient(90deg, #a86e3b, #502c80);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        animation: subtleGlow 3s infinite alternate;
+    }
+
+    @keyframes subtleGlow {
+        from { text-shadow: 0px 0px 4px rgba(168, 110, 59, 0.3), 0px 0px 8px rgba(80, 44, 128, 0.3); }
+        to { text-shadow: 0px 0px 8px rgba(168, 110, 59, 0.4), 0px 0px 12px rgba(80, 44, 128, 0.4); }
+    }
+
+    /* Travis Scott-Inspired Buttons */
+    .btn-gradient {
+        background: linear-gradient(45deg, #5e362a, #c7925b);
+        color: #f0e6de; /* Lighter but not too bright */
+        font-weight: bold;
+        text-transform: uppercase;
+        border: none;
+        border-radius: 12px;
+        padding: 12px 20px;
+        transition: 0.3s ease-in-out;
+        box-shadow: 0px 0px 10px rgba(100, 40, 20, 0.3);
+    }
+
+    .btn-gradient:hover {
+        transform: scale(1.08);
+        box-shadow: 0px 0px 16px rgba(130, 60, 10, 0.5);
+    }
+
+    /* Task Text - White with a Soft Glow */
+    .table tbody tr td {
+        font-family: 'Anton', sans-serif;
+        font-size: 1.2em;
+        color: #fbf6f6;
+        background: rgba(20, 20, 25, 0.5);
+        padding: 10px;
+        border-radius: 6px;
+        box-shadow: inset 0px 0px 5px rgba(255, 140, 0, 0.3);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    /* Hover Effect - Soft Orange Glow */
+    .table-hover tbody tr:hover td {
+        background: rgba(73, 43, 43, 0.3);
+        box-shadow: 0px 0px 8px rgba(255, 140, 0, 0.5);
+        transition: 0.3s ease-in-out;
+    }
+
+
+
+    /* Glowing Borders */
+    .card {
+        background: rgba(15, 15, 25, 0.95);
+        border-radius: 12px;
+        box-shadow: 0px 8px 30px rgba(80, 44, 128, 0.2);
+        overflow: hidden;
+        border: 1px solid rgba(130, 60, 10, 0.3);
+    }
+
+    /* Futuristic Alert Boxes */
+    .alert {
+        background: rgba(30, 15, 40, 0.8);
+        border: 1px solid rgba(100, 40, 20, 0.3);
+        box-shadow: 0px 0px 12px rgba(100, 40, 20, 0.2);
+        border-radius: 10px;
+        color: #dcd8d3;
+    }
+
+
+
+</style>
+{% endblock %}
+
+<!-- JavaScript for handling the checkbox click to strike through -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add event listener to all checkboxes
+        document.querySelectorAll('.task-checkbox').forEach(function(checkbox) {
+            checkbox.addEventListener('change', function() {
+                let taskRow = this.closest('tr');
+                
+                // Toggle the completed class on the task row
+                if (this.checked) {
+                    taskRow.classList.add('completed');
+                } else {
+                    taskRow.classList.remove('completed');
+                }
+            });
+        });
+    });
+</script>
